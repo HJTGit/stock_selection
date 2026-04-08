@@ -84,27 +84,28 @@ function initTables() {
         ordering: true,
         paging: true,
         pageLength: 10,
+        stripeClasses: ['odd', 'even'],
         language: {
-            //url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/zh-CN.json'
+            lengthMenu: '每页 _MENU_ 条',
+            zeroRecords: '没有找到匹配的数据',
+            info: '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
+            infoEmpty: '暂无数据',
+            infoFiltered: '(filtered from _MAX_ total entries)',
+            search: '搜索:',
+            paginate: {
+                first: '首页',
+                previous: '上一页',
+                next: '下一页',
+                last: '末页'
+            }
         },
         order: [[0, 'asc']],
         columnDefs: [
             {
-                targets: 0, // 代码列
-    render: function(data, type, row, meta) {
-        // 获取该行数据
-        const rowData = selectedTable.row(meta.row).data();
-        const isHighlighted = rowData && rowData._highlight || false;
-
-        if (type === 'display') {
-            let display = data || '';
-            if (isHighlighted) {
-                display += ' <span class="highlight-indicator">建议买入</span>';
-            }
-            return display;
-        }
-        return data; // 用于排序和搜索
-    }
+                targets: 2, // 概念列
+                render: function(data, type, row) {
+                    return formatConcepts(data);
+                }
             }
         ]
     });
@@ -114,8 +115,20 @@ function initTables() {
         ordering: true,
         paging: true,
         pageLength: 10,
+        stripeClasses: ['odd', 'even'],
         language: {
-            //url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/zh-CN.json'
+            lengthMenu: '每页 _MENU_ 条',
+            zeroRecords: '没有找到匹配的数据',
+            info: '显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条',
+            infoEmpty: '暂无数据',
+            infoFiltered: '(filtered from _MAX_ total entries)',
+            search: '搜索:',
+            paginate: {
+                first: '首页',
+                previous: '上一页',
+                next: '下一页',
+                last: '末页'
+            }
         },
         order: [[0, 'asc']],
         columnDefs: [
@@ -264,8 +277,7 @@ function updateTables(data) {
                 stock.name,
                 stock.concept || '--',
                 formatPrice(stock.close_price),
-                formatPercent(stock.change_percent),
-                formatPrice(stock.limit_up_price)
+                formatPercent(stock.change_percent)
             ]);
         });
     }
@@ -278,18 +290,11 @@ function updateTables(data) {
             if (isHighlighted) highlightCount++;
 
             // 添加操作按钮
-            const actionBtn = `
-    <div class="btn-group" role="group">
-        <button class="btn btn-sm btn-outline-primary" onclick="viewStockDetail('${stock.code}', '${stock.name}', '${stock.concept || ''}')">
-            <i class="bi bi-eye"></i> 详情
-        </button>
-        ${isHighlighted ? `
-        <button class="btn btn-sm btn-success" onclick="showHighlightReason('${stock.code}')" title="建议买入">
-            <i class="bi bi-arrow-up-circle"></i> 建议买入
-        </button>
-        ` : ''}
-    </div>
-`;
+            const actionBtn = isHighlighted ? `
+    <button class="btn btn-sm btn-success" onclick="showHighlightReason('${stock.code}')" title="建议买入">
+        <i class="bi bi-arrow-up-circle"></i> 建议买入
+    </button>
+` : '-';
 
             // 添加行数据，包含高亮标记
             selectedTable.row.add({

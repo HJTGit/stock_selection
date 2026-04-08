@@ -25,10 +25,34 @@
     font-weight: 600;
     color: #495057;
     background-color: #f8f9fa;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td {
+    text-align: center;
+    vertical-align: middle;
 }
 
 .table-hover tbody tr:hover {
     background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* 斑马纹样式 */
+table.dataTable tbody tr.odd {
+    background-color: rgba(0, 123, 255, 0.12) !important;
+}
+
+table.dataTable tbody tr.even {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+table.dataTable tbody tr.odd.highlight-stock {
+    background-color: rgba(255, 215, 0, 0.25) !important;
+}
+
+table.dataTable tbody tr.even.highlight-stock {
+    background-color: rgba(255, 215, 0, 0.18) !important;
 }
 
 .badge {
@@ -36,24 +60,6 @@
     padding: 0.35em 0.65em;
 }
 
-.concept-tag {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    margin: 0.1rem;
-    border-radius: 15px;
-    font-size: 0.85em;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
-}
-
-.concept-tag:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-}
 
 .stock-code {
     font-family: 'Courier New', monospace;
@@ -107,18 +113,21 @@
 /* 概念标签样式 */
 .concept-tag {
     display: inline-block;
-    background-color: #e3f2fd;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin: 2px;
-    font-size: 0.85rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    margin: 0.1rem;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
 }
 
 .concept-tag:hover {
-    background-color: #bbdefb;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
 }
 
 /* 策略标签样式 */
@@ -187,4 +196,83 @@
 
 .concept-tag {
     animation: fadeIn 0.3s ease-out;
+}
+
+/* DataTables 表格边框 */
+table.dataTable {
+    border-collapse: collapse !important;
+}
+
+table.dataTable thead th,
+table.dataTable tbody td {
+    border: none !important;
+}
+
+table.dataTable.no-footer {
+    border-bottom: none !important;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    padding: 0.5rem 0;
+}
+
+/* 翻页按钮样式 */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: 0.25rem !important;
+    border: 1px solid #dee2e6 !important;
+    margin: 0 2px;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem;
+    color: #0d6efd !important;
+    background: #fff !important;
+    transition: all 0.2s;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #e9ecef !important;
+    border-color: #dee2e6 !important;
+    color: #0a58ca !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    color: #6c757d !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    background: #fff !important;
+    border-color: #dee2e6 !important;
+    color: #6c757d !important;
+}
+
+/* 搜索框样式 */
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 0.25rem !important;
+    border: 1px solid #dee2e6 !important;
+    padding: 0.375rem 0.75rem !important;
+    margin-left: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #0d6efd !important;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* 下拉框样式 */
+.dataTables_wrapper .dataTables_length select {
+    border-radius: 0.25rem !important;
+    border: 1px solid #dee2e6 !important;
+    padding: 0.375rem 0.75rem !important;
 }
