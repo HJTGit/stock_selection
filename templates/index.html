@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北部湾智能选股系统</title>
+    <!-- Favicon 图标 -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link href="https://cdn.staticfile.net/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.net/bootstrap-icons/1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-graph-up"></i> 北部湾智能选股系统
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- 控制面板 -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-calendar"></i> 选择日期
+                                    </span>
+                                    <input type="date" id="datePicker" class="form-control"
+                                           value="{{ today }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group w-100" role="group">
+                                    <button type="button" class="btn btn-outline-primary active"
+                                            onclick="selectRule('all')">
+                                        <i class="bi bi-filter-circle"></i> 全部策略
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success"
+                                            onclick="selectRule('rule1')">
+                                        <i class="bi bi-1-circle"></i> 策略A
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info"
+                                            onclick="selectRule('rule2')">
+                                        <i class="bi bi-2-circle"></i> 策略B
+                                    </button>
+                                    <button type="button" class="btn btn-primary"
+                                            onclick="loadStocks()">
+                                        <i class="bi bi-search"></i> 查询
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 统计信息 -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">选择日期</h6>
+                                        <h4 id="selectedDate" class="card-title">--</h4>
+                                        <small id="lunarDate" class="text-muted">农历: --</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning bg-opacity-10">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">涨停股票</h6>
+                                        <h4 id="limitUpCount" class="card-title text-warning">0</h4>
+                                        <small class="text-muted">只</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success bg-opacity-10">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">策略A选股</h6>
+                                        <h4 id="rule1Count" class="card-title text-success">0</h4>
+                                        <small class="text-muted">只</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info bg-opacity-10">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">策略B选股</h6>
+                                        <h4 id="rule2Count" class="card-title text-info">0</h4>
+                                        <small class="text-muted">只</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+ <!-- 选股结果表格 -->
+                        <div class="card">
+                            <div class="card-header bg-success bg-opacity-25">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-star"></i> 选股结果
+                                    <span class="badge bg-success float-end" id="selectedBadge">0</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="selectedTable" class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>代码</th>
+                                                <th>名称</th>
+                                                <th>概念</th>
+                                                <th>选股策略</th>
+                                                <th>收盘价</th>
+                                                <th>涨跌幅</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- 数据由JavaScript填充 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 涨停股票表格 -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-warning bg-opacity-25">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-lightning-charge"></i> 涨停股票列表
+                                    <span class="badge bg-warning float-end" id="limitUpBadge">0</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="limitUpTable" class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>代码</th>
+                                                <th>名称</th>
+                                                <th>概念</th>
+                                                <th>收盘价</th>
+                                                <th>涨跌幅</th>
+                                                <th>涨停价</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- 数据由JavaScript填充 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="card-footer text-muted text-center">
+                        <small>
+                            <i class="bi bi-info-circle"></i>
+                            系统说明: 基于量化策略的智能选股系统，具体策略逻辑为内部算法
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div id="loading" class="loading-overlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">加载中...</span>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.staticfile.net/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap5.min.css"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
