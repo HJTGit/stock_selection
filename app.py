@@ -104,31 +104,30 @@ class StockSelectionSystem:
             return None
 
     def save_limit_up_stocks_to_db(self, date_str: str, stocks: List[Dict]):
-        """保存涨停股票数据到数据库"""
+        """保存涨停股票数据到数据库（先清空当天数据再存入）"""
         try:
             trade_date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
+            # 先删除当天已有数据
+            LimitUpStock.query.filter_by(trade_date=trade_date).delete()
+
+            # 批量插入新数据
+            limit_up_stocks = []
             for stock in stocks:
-                # 检查是否已存在
-                existing = LimitUpStock.query.filter_by(
+                limit_up_stock = LimitUpStock(
                     trade_date=trade_date,
-                    stock_code=stock['code']
-                ).first()
+                    stock_code=stock['code'],
+                    stock_name=stock['name'],
+                    concept=stock.get('concept', ''),
+                    close_price=stock.get('close_price', 0),
+                    change_percent=stock.get('change_percent', 0),
+                    limit_up_price=stock.get('limit_up_price', 0)
+                )
+                limit_up_stocks.append(limit_up_stock)
 
-                if not existing:
-                    limit_up_stock = LimitUpStock(
-                        trade_date=trade_date,
-                        stock_code=stock['code'],
-                        stock_name=stock['name'],
-                        concept=stock.get('concept', ''),
-                        close_price=stock.get('close_price', 0),
-                        change_percent=stock.get('change_percent', 0),
-                        limit_up_price=stock.get('limit_up_price', 0)
-                    )
-                    db.session.add(limit_up_stock)
-
+            db.session.bulk_save_objects(limit_up_stocks)
             db.session.commit()
-            print(f"已保存{len(stocks)}只涨停股票数据到数据库，日期：{date_str}")
+            print(f"已清空并保存{len(stocks)}只涨停股票数据到数据库，日期：{date_str}")
 
         except Exception as e:
             db.session.rollback()
@@ -159,36 +158,34 @@ class StockSelectionSystem:
             return []
 
     def save_selected_stocks_to_db(self, date_str: str, stocks: List[Dict]):
-        """保存选股结果到数据库"""
+        """保存选股结果到数据库（先清空当天数据再存入）"""
         try:
             trade_date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
+            # 先删除当天已有数据
+            SelectedStock.query.filter_by(trade_date=trade_date).delete()
+
+            # 批量插入新数据
+            selected_stocks = []
             for stock in stocks:
-                # 检查是否已存在
-                existing = SelectedStock.query.filter_by(
+                selected_stock = SelectedStock(
                     trade_date=trade_date,
                     stock_code=stock['code'],
-                    rule_code=stock.get('rule_code', 0)
-                ).first()
+                    stock_name=stock['name'],
+                    concept=stock.get('concept', ''),
+                    close_price=stock.get('close_price', 0),
+                    change_percent=stock.get('change_percent', 0),
+                    limit_up_price=stock.get('limit_up_price', 0),
+                    rule=stock.get('rule', ''),
+                    rule_code=stock.get('rule_code', 0),
+                    divisor=stock.get('divisor', 0),
+                    calculation=stock.get('calculation', '')
+                )
+                selected_stocks.append(selected_stock)
 
-                if not existing:
-                    selected_stock = SelectedStock(
-                        trade_date=trade_date,
-                        stock_code=stock['code'],
-                        stock_name=stock['name'],
-                        concept=stock.get('concept', ''),
-                        close_price=stock.get('close_price', 0),
-                        change_percent=stock.get('change_percent', 0),
-                        limit_up_price=stock.get('limit_up_price', 0),
-                        rule=stock.get('rule', ''),
-                        rule_code=stock.get('rule_code', 0),
-                        divisor=stock.get('divisor', 0),
-                        calculation=stock.get('calculation', '')
-                    )
-                    db.session.add(selected_stock)
-
+            db.session.bulk_save_objects(selected_stocks)
             db.session.commit()
-            print(f"已保存{len(stocks)}条选股结果到数据库，日期：{date_str}")
+            print(f"已清空并保存{len(stocks)}条选股结果到数据库，日期：{date_str}")
 
         except Exception as e:
             db.session.rollback()
